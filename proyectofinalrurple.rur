@@ -1,0 +1,81 @@
+def atras(robot):
+    for i in range(2):
+        robot.turn_left()
+def derecha(robot):
+    for i in range(3):
+            robot.turn_left()
+def mover_robot(punto,turno,jugadores):
+    lugares={1:[3,3],2:[3,6],3:[3,9],4:[6,3],5:[6,6],6:[6,9],7:[9,3],8:[9,6],9:[9,9]}
+    objetivo=lugares[punto]
+    for street in range(objetivo[0]-1):
+        jugadores[turno].move()
+    if turno:
+        jugadores[turno].turn_left()
+    else:
+        derecha(jugadores[turno])
+    for avenue in range(abs(objetivo[1]-jugadores[turno].avenida)):
+        jugadores[turno].move()
+    while jugadores[turno].on_beeper():
+        jugadores[turno].pick_beeper()
+    atras(jugadores[turno])
+    for i in range(turno+1):
+        jugadores[turno].put_beeper()
+    for avenue in range(abs(objetivo[1]-jugadores[turno].avenida)):
+        jugadores[turno].move()
+    if not turno:
+        jugadores[turno].turn_left()
+    else:
+        derecha(jugadores[turno])
+    for street in range(objetivo[0]-1):
+        jugadores[turno].move()
+    atras(jugadores[turno])
+p1=UsedRobot(avenues=1,streets=1,orient_key="N",beepers=20,name="Jugador 1",colour="yellow")
+p2=UsedRobot(avenues=11,streets=1,orient_key="N",beepers=20,name="Jugador 2",colour="green")
+p1.avenida=1
+p1.puntos=[]
+p1.nombre="Jugador 1"
+p2.avenida=11
+p2.puntos=[]
+p2.nombre="Jugador 2"
+posiciones=[1,2,3,4,5,6,7,8,9]
+end_game=False
+jugadores=[p1,p2]
+while not end_game:
+    for player in range(2):
+        punto=input_int("Elija una de las posiciones permitidas")
+        while punto not in posiciones:
+            punto=input_int("Elija una de las posiciones permitidas")
+        jugadores[player].puntos.append(punto)
+        posiciones.remove(punto)
+        mover_robot(punto,player,jugadores)
+        for i in range(1,8,3):
+            if i in jugadores[player].puntos and i+1 in jugadores[player].puntos and i+2 in jugadores[player].puntos:
+                print(jugadores[player].nombre," gana")
+                end_game=True
+                break
+        for i in range(1,4):
+            if i in jugadores[player].puntos and i+3 in jugadores[player].puntos and i+6 in jugadores[player].puntos:
+                print(jugadores[player].nombre," gana")
+                end_game=True
+                break
+        for i in range(1,4,2):
+            if i in jugadores[player].puntos and  i+4 in jugadores[player].puntos and i+6 in jugadores[player].puntos:
+                print(jugadores[player].nombre," gana")
+                end_game=True
+                break
+        if 7 in jugadores[player].puntos and 5 in jugadores[player].puntos and 3 in jugadores[player].puntos:
+            print(jugadores[player].nombre," gana")
+            end_game=True
+            break
+        elif 1 in jugadores[player].puntos and 5 in jugadores[player].puntos and 9 in jugadores[player].puntos:
+            print(jugadores[player].nombre," gana")
+            end_game=True
+            break
+        if end_game:
+            break
+    if len(posiciones)==0:
+        break
+p1.turn_off()
+p2.turn_off()
+if not end_game:
+    print("No hay mas posiciones disponibles, empate")
